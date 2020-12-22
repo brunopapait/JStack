@@ -1,16 +1,23 @@
 const http = require('http');
+const routes = require('./routes');
+const url = require('url');
 
-const users = require('./mocks/users');
 
 const server = http.createServer(function (request, response) {
-  console.log(`Método: ${request.method} | URL: ${request.url}`);
+  const parsedUrl = url.parse(request.url, true);
 
-  if (request.method === 'GET' && request.url === '/users') {
-    response.writeHead(200, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify(users));
+  request.query = parsedUrl.query;
+  console.log(`Método: ${request.method} | URL: ${parsedUrl.pathname}`);
+
+  const route = routes.find((routeObj) => (
+    routeObj.endpoint === parsedUrl.pathname && routeObj.method === request.method
+  ));
+
+  if (route) {
+    route.handler(request, response);
   } else {
     response.writeHead(404, { 'Content-Type': 'application/json' });
-    response.end(`Cannot ${request.method} ${request.url}`);
+    response.end(`Cannot ${request.method} ${parsedUrl.pathname}`);
   }
 });
 
