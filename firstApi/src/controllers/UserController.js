@@ -1,5 +1,5 @@
 const { request } = require('https');
-const users = require('../mocks/users');
+let users = require('../mocks/users');
 
 module.exports = {
   listUsers(req, res) {
@@ -36,5 +36,45 @@ module.exports = {
     users.push(newUser);
 
     res.send(200, newUser);
+  },
+  updateUser(req, res) {
+    let { id } = req.params;
+    const { name } = req.body;
+
+    id = Number(id);
+
+    const userExists = users.find((user) => user.id === id);
+
+    if (!userExists) {
+      return res.send(400, { error: 'User not found' });
+    }
+
+    users = users.map((user) => {
+      if (user.id === id) {
+        return {
+          id,
+          name
+        }
+      }
+
+      return user;
+    })
+
+    res.send(200, { id, name });
+  },
+  removeUser(req, res) {
+    let { id } = req.params;
+
+    id = Number(id);
+
+    const userExists = users.find((user) => user.id === id);
+
+    if (!userExists) {
+      return res.send(400, { error: 'User not found' });
+    }
+
+    users = users.filter((user) => user.id !== id);
+
+    res.send(200, { deleted: true });
   }
 }
