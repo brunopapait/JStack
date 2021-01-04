@@ -1,3 +1,4 @@
+const { findById } = require('../repository/ContactsRepository');
 const ContactsRepository = require('../repository/ContactsRepository');
 
 class ContactController {
@@ -49,10 +50,36 @@ class ContactController {
     return response.json(contact);
   }
 
-  update() {
+  async update(request, response) {
     /**
      * Atualizar/Editar UM registro
      */
+    const { id } = request.params;
+    const {
+      name, email, fone, category_id,
+    } = request.body;
+
+    const contactExists = await ContactsRepository.findById(id);
+
+    if (!contactExists) {
+      return response.status(404).json({ error: 'Contact not found' });
+    }
+
+    if (!name) {
+      return response.status(400).json({ error: 'Name is required' });
+    }
+
+    const contactEmailExists = await ContactsRepository.findByEmail(email);
+
+    if (contactEmailExists && contactEmailExists.id !== id) {
+      return response.status(400).json({ error: 'This e-mail is already been use' });
+    }
+
+    const contact = await ContactsRepository.update(id, {
+      name, email, fone, category_id,
+    });
+
+    return response.json(contact);
   }
 
   async delete(request, response) {
