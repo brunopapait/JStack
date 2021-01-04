@@ -5,9 +5,8 @@ class ContactController {
   /**
    * Listar todos os registros.
    */
-
     const contacts = await ContactsRepository.findAll();
-    response.json(contacts);
+    return response.json(contacts);
   }
 
   async show(request, response) {
@@ -24,10 +23,30 @@ class ContactController {
     return response.json(contact);
   }
 
-  store() {
+  async store(request, response) {
     /**
      * Criar novo registro
      */
+
+    const {
+      name, email, fone, category_id,
+    } = request.body;
+
+    const contactEmailExists = await ContactsRepository.findByEmail(email);
+
+    if (!name) {
+      return response.status(400).json({ error: 'Name is required' });
+    }
+
+    if (contactEmailExists) {
+      return response.status(400).json({ error: 'This e-mail is already been talken' });
+    }
+
+    const contact = await ContactsRepository.create({
+      name, email, fone, category_id,
+    });
+
+    return response.json(contact);
   }
 
   update() {
