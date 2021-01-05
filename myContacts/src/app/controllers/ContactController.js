@@ -1,4 +1,3 @@
-const { findById } = require('../repository/ContactsRepository');
 const ContactsRepository = require('../repository/ContactsRepository');
 
 class ContactController {
@@ -6,7 +5,9 @@ class ContactController {
   /**
    * Listar todos os registros.
    */
-    const contacts = await ContactsRepository.findAll();
+    const { orderBy } = request.query;
+
+    const contacts = await ContactsRepository.findAll(orderBy);
     return response.json(contacts);
   }
 
@@ -30,7 +31,7 @@ class ContactController {
      */
 
     const {
-      name, email, fone, category_id,
+      name, email, phone, category_id,
     } = request.body;
 
     const contactEmailExists = await ContactsRepository.findByEmail(email);
@@ -44,7 +45,7 @@ class ContactController {
     }
 
     const contact = await ContactsRepository.create({
-      name, email, fone, category_id,
+      name, email, phone, category_id,
     });
 
     return response.json(contact);
@@ -56,7 +57,7 @@ class ContactController {
      */
     const { id } = request.params;
     const {
-      name, email, fone, category_id,
+      name, email, phone, category_id,
     } = request.body;
 
     const contactExists = await ContactsRepository.findById(id);
@@ -76,7 +77,7 @@ class ContactController {
     }
 
     const contact = await ContactsRepository.update(id, {
-      name, email, fone, category_id,
+      name, email, phone, category_id,
     });
 
     return response.json(contact);
