@@ -1,4 +1,5 @@
 const ContactsRepository = require('../repository/ContactsRepository');
+const CategoriesRepository = require('../repository/CategoriesRepository');
 
 class ContactController {
   async index(request, response) {
@@ -34,6 +35,14 @@ class ContactController {
       name, email, phone, category_id,
     } = request.body;
 
+    if (category_id) {
+      const category = await CategoriesRepository.findById(category_id);
+
+      if (!category) {
+        return response.status(404).json({ error: 'Category not found' });
+      }
+    }
+
     const contactEmailExists = await ContactsRepository.findByEmail(email);
 
     if (!name) {
@@ -59,6 +68,14 @@ class ContactController {
     const {
       name, email, phone, category_id,
     } = request.body;
+
+    if (category_id) {
+      const category = await CategoriesRepository.findById(category_id);
+
+      if (!category) {
+        return response.status(404).json({ error: 'Category not found' });
+      }
+    }
 
     const contactExists = await ContactsRepository.findById(id);
 
