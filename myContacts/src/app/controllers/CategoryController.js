@@ -19,8 +19,6 @@ class CategoryController {
 
     const category = await CategoriesRepository.create({ name });
 
-    console.log(category);
-
     return response.json(category);
   }
 
